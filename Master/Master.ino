@@ -1,6 +1,7 @@
 //NodemCu master: D1=SCL D2=SDA
-//ArduinUno slave1: A5=SCL A4=SDA (arduino Uno)
+//ArduinUno slaves: A5=SCL A4=SDA (arduino Uno)
 
+//working pins on NodeMcu: rx(3), D2(4), D1(5), D5(14), D6(12), D7(13)
 #include <Wire.h>
 #include <ESP8266WiFi.h>
 #include <AdafruitIO.h>
