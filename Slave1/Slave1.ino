@@ -12,6 +12,7 @@ void setup() {
   declarePins();
   Wire.begin(8);
   Wire.onReceive(receiveEvent);
+  Serial.println("ready");
 }
 
 void loop() {
@@ -21,7 +22,7 @@ void loop() {
 }
 
 void receiveEvent(int howMany) {
-  data = "";
+  //data = "";
   while (Wire.available()) {
     data += (char)Wire.read();
   }

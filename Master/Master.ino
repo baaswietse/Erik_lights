@@ -1,7 +1,9 @@
 //NodemCu master: D1=SCL D2=SDA
 //ArduinUno slaves: A5=SCL A4=SDA (arduino Uno)
+//ArduinUno slaves: D21=SCL D20=SDA (arduino Mega)
 
 //working pins on NodeMcu: rx(3), D2(4), D1(5), D5(14), D6(12), D7(13)
+
 #include <Wire.h>
 #include <ESP8266WiFi.h>
 #include <AdafruitIO.h>
@@ -42,25 +44,54 @@ void loop() {
 }
 
 void handleMessage(AdafruitIO_Data *data) {
+  String msg = data->value();
+
+  //--------------MET DIMMER--------------------
+  if (msg.indexOf(';') != -1){//-1 als er geen ';' is
+    Serial.println("DIMMER");
+    int index = msg.indexOf(';');
+    String lamp = msg.substring(0, index);
+    String dim = msg.substring(index+1);
+    Serial.println("lamp: " + lamp + " " + "dimmer: " + dim);
+    Serial.println();
+    
+  }
+  //--------------GEWOON, ZONDER DIMMER----------------
+  else{
+    String temp = msg;
+    char sendChar[temp.length() + 1];
+    temp.toCharArray(sendChar, temp.length() + 1);
+    
+    if(msg.toInt() <= 68 && msg != "DONE"){
+      Serial.println("GEEN DIMMER");
+      Serial.println("Sending '" + msg + "' to slave 1...");
+      Serial.println();
+      Wire.beginTransmission(8); // transmit to device #8
+      Wire.write(sendChar);
+      Wire.endTransmission();    // stop transmitting
+      command->save("DONE");
+    }else if(msg.toInt() > 68 && msg != "DONE"){
+      Serial.println("GEEN DIMMER");
+      Serial.println("Sending '" + msg + "' to slave 2...");
+      Serial.println();
+      Wire.beginTransmission(9); // transmit to device #9
+      Wire.write(sendChar);
+      Wire.endTransmission();    // stop transmitting
+      command->save("DONE");
+    }
+  }
+   
+  /*
   int input = data->toInt();
   //char* sendChar = data->toChar();
-  Serial.println(String(data->value())); 
+  Serial.println("input: " + String(data->value())); 
   
   String temp = String(input);
   char sendChar[temp.length() + 1];
   temp.toCharArray(sendChar, temp.length() + 1);
+  */
+
+
   
-  if(input <= 68 && String(data->value()) != "DONE"){
-    Serial.println("Sending '" + String(input) + "' to slave 1...");
-    Wire.beginTransmission(8); // transmit to device #8
-    Wire.write(sendChar);
-    Wire.endTransmission();    // stop transmitting
-    command->save("DONE");
-  }else if(input > 68 && String(data->value()) != "DONE"){
-    Serial.println("Sending '" + String(input) + "' to slave 2...");
-    Wire.beginTransmission(9); // transmit to device #8
-    Wire.write(sendChar);
-    Wire.endTransmission();    // stop transmitting
-    command->save("DONE");
-  }
+
 }
